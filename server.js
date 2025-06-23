@@ -28,6 +28,6 @@ app.post('/create-file', (req, res) => {
 });
 
 // 启动服务
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`服务已启动: http://0.0.0.0:${PORT}`);
 });
