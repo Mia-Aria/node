@@ -27,26 +27,20 @@ if (!fs.existsSync(FILE_PATH)) {
  * 访问示例：GET http://your-server-ip:3001/download
  */
 app.get('/download', (req, res) => {
-  try {
-    // 检查文件是否存在
-    if (!fs.existsSync(FILE_PATH)) {
-      return res.status(404).json({ success: false, error: '文件不存在' });
+    try {
+      const filePath = path.join(FILE_DIR, 'example.txt');
+      
+      // 设置下载头
+      res.setHeader('Content-Disposition', 'attachment; filename="example.txt"');
+      res.setHeader('Content-Type', 'text/plain');
+  
+      // 发送文件
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-
-    // 设置下载文件名（可选，默认使用服务器上的文件名）
-    const downloadName = req.query.filename || 'downloaded-file.txt';
-
-    // 返回文件供下载
-    res.download(FILE_PATH, downloadName, (err) => {
-      if (err) {
-        console.error('下载失败:', err);
-        res.status(500).json({ success: false, error: '文件下载失败' });
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
+  });
 
 // 启动服务
 app.listen(PORT, '0.0.0.0', () => {
