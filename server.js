@@ -5,23 +5,44 @@ const path = require('path');
 const app = express();
 const PORT = 3001;
 
-// 允许 JSON 请求体解析
+// 允许 JSON 请求体解析（可选）
 app.use(express.json());
 
+// 存放文件的目录（确保存在）
+const FILE_DIR = path.join(__dirname, 'files');
+const FILE_PATH = path.join(FILE_DIR, 'example.txt');
+
+// 初始化文件（如果不存在）
+if (!fs.existsSync(FILE_DIR)) {
+  fs.mkdirSync(FILE_DIR, { recursive: true });
+}
+
+// 写入默认内容（可选）
+if (!fs.existsSync(FILE_PATH)) {
+  fs.writeFileSync(FILE_PATH, '这是默认的文本文件内容\n欢迎下载！');
+}
+
 /**
- * 创建/修改桌面文件
- * 请求示例：POST http://localhost:3001/create-file
- * Body: { "content": "Hello, World!" }
+ * 提供文件下载
+ * 访问示例：GET http://your-server-ip:3001/download
  */
-app.post('/create-file', (req, res) => {
+app.get('/download', (req, res) => {
   try {
-    const desktopPath = path.join(require('os').homedir(), 'Desktop'); // 获取桌面路径
-    const filePath = path.join(desktopPath, 'test.txt'); // 文件路径
+    // 检查文件是否存在
+    if (!fs.existsSync(FILE_PATH)) {
+      return res.status(404).json({ success: false, error: '文件不存在' });
+    }
 
-    // 写入文件（如果文件不存在会自动创建）
-    fs.writeFileSync(filePath, req.body.content || 'Default content');
+    // 设置下载文件名（可选，默认使用服务器上的文件名）
+    const downloadName = req.query.filename || 'downloaded-file.txt';
 
-    res.json({ success: true, message: `文件已创建/修改: ${filePath}` });
+    // 返回文件供下载
+    res.download(FILE_PATH, downloadName, (err) => {
+      if (err) {
+        console.error('下载失败:', err);
+        res.status(500).json({ success: false, error: '文件下载失败' });
+      }
+    });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -29,5 +50,5 @@ app.post('/create-file', (req, res) => {
 
 // 启动服务
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`服务已启动: http://0.0.0.0:${PORT}`);
+  console.log(`服务已启动: http://0.0.0.0:${PORT}`);
 });
