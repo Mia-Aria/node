@@ -1,48 +1,86 @@
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
-
 const app = express();
 const PORT = 3001;
 
-// 允许 JSON 请求体解析（可选）
+// 中间件：解析 JSON 请求体
 app.use(express.json());
 
-// 存放文件的目录（确保存在）
-const FILE_DIR = path.join(__dirname, 'files');
-const FILE_PATH = path.join(FILE_DIR, 'example.txt');
-
-// 初始化文件（如果不存在）
-if (!fs.existsSync(FILE_DIR)) {
-  fs.mkdirSync(FILE_DIR, { recursive: true });
-}
-
-// 写入默认内容（可选）
-if (!fs.existsSync(FILE_PATH)) {
-  fs.writeFileSync(FILE_PATH, '这是默认的文本文件内容\n欢迎下载！');
-}
-
-/**
- * 提供文件下载
- * 访问示例：GET http://your-server-ip:3001/download
- */
-app.get('/download', (req, res) => {
-    try {
-      const filePath = path.join(FILE_DIR, 'example.txt');
-      
-      // 设置下载头
-      res.setHeader('Content-Disposition', 'attachment; filename="example.txt"');
-      res.setHeader('Content-Type', 'text/plain');
-  
-      // 发送文件
-      const fileStream = fs.createReadStream(filePath);
-      fileStream.pipe(res);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+// 根路由
+app.get('/', (req, res) => {
+  res.json({
+    status: 'success',
+    data: {
+      message: 'Welcome to our API!',
+      version: '1.0.0'
     }
   });
+});
 
-// 启动服务
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`服务已启动: http://0.0.0.0:${PORT}`);
+// 用户路由
+app.get('/api/users', (req, res) => {
+  const users = [
+    { id: 1, name: 'Alice' },
+    { id: 2, name: 'Bob' }
+  ];
+  
+  res.json({
+    status: 'success',
+    data: users
+  });
+});
+
+// 带参数的路由
+app.get('/api/users/:id', (req, res) => {
+  const userId = parseInt(req.params.id);
+  
+  // 模拟数据库查找
+  const user = { id: userId, name: `User ${userId}` };
+  
+  res.json({
+    status: 'success',
+    data: user
+  });
+});
+
+// POST 请求示例
+app.post('/api/users', (req, res) => {
+  const newUser = req.body; // 从请求体获取数据
+  
+  // 模拟创建用户
+  const createdUser = {
+    id: Math.floor(Math.random() * 1000),
+    ...newUser
+  };
+  
+  res.status(201).json({
+    status: 'success',
+    data: createdUser
+  });
+});
+
+// 404 处理
+app.use((req, res) => {
+  res.status(404).json({
+    status: 'error',
+    message: 'Not Found'
+  });
+});
+
+// 错误处理中间件
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    status: 'error',
+    message: 'Something went wrong!'
+  });
+});
+
+// 启动服务器
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+  console.log('Available endpoints:');
+  console.log(`- GET http://localhost:${PORT}/`);
+  console.log(`- GET http://localhost:${PORT}/api/users`);
+  console.log(`- GET http://localhost:${PORT}/api/users/1`);
+  console.log(`- POST http://localhost:${PORT}/api/users`);
 });
