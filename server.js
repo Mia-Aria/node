@@ -1,9 +1,12 @@
 const express = require('express');
+const cors = require('cors');
+
 const app = express();
-const PORT = 3001;
+const PORT = 4000;
 
 // 中间件：解析 JSON 请求体
 app.use(express.json());
+app.use(cors()); 
 
 // 根路由
 app.get('/', (req, res) => {
@@ -76,7 +79,7 @@ app.use((err, req, res, next) => {
 });
 
 // 启动服务器
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running at http://localhost:${PORT}`);
   console.log('Available endpoints:');
   console.log(`- GET http://localhost:${PORT}/`);
