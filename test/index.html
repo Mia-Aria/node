@@ -2,7 +2,7 @@
  * @Author: gaoyang334 gaoyang334@jd.com
  * @Date: 2025-07-07 11:22:28
  * @LastEditors: gaoyang334 gaoyang334@jd.com
- * @LastEditTime: 2025-07-07 15:12:19
+ * @LastEditTime: 2025-07-07 16:03:34
  * @FilePath: /node-be/index.html
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -56,6 +56,10 @@
     <button onclick="convertToJson()">Convert to JSON</button>
     
     <div id="result"></div>
+
+    <button onclick="getUsers()">Get Users</button>
+    
+    <div id="result-user"></div>
   </div>
 
   <script>
@@ -82,6 +86,22 @@
 
         if (!response.ok) {
           throw new Error('Conversion failed');
+        }
+
+        const data = await response.json();
+        resultDiv.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        resultDiv.textContent = 'Error: ' + error.message;
+      }
+    }
+
+    async function getUsers() {
+      const resultDiv = document.getElementById('result-user');
+      try {
+        const response = await fetch('http://localhost:4000/api/users');
+
+        if (!response.ok) {
+          throw new Error('Get users data failed');
         }
 
         const data = await response.json();

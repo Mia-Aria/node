@@ -6,7 +6,7 @@ const config = require('../../../config/default.json');
 module.exports = (app) => {
   // MongoDB 配置 也可以写到 config 文件夹中
   const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
-  const dbName = process.env.MONGODB_NAME || 'user';
+  const dbName = 'user';
   
   let dbClient;
   let db;
@@ -37,6 +37,7 @@ module.exports = (app) => {
     getUsers: async (req, res) => {
       try {
         const users = await db.collection('users').find().toArray();
+        
         res.json({
           status: 'success',
           data: users
