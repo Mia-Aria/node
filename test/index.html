@@ -2,7 +2,7 @@
  * @Author: gaoyang334 gaoyang334@jd.com
  * @Date: 2025-07-07 11:22:28
  * @LastEditors: gaoyang334 gaoyang334@jd.com
- * @LastEditTime: 2025-07-07 16:03:34
+ * @LastEditTime: 2025-07-07 16:53:18
  * @FilePath: /node-be/index.html
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -49,7 +49,7 @@
   </style>
 </head>
 <body>
-  <h1>Excel to JSON Converter</h1>
+  <h1>TEST</h1>
   <div class="container">
     <h2>Upload Excel File</h2>
     <input type="file" id="fileInput" accept=".xlsx,.xls" />
@@ -57,6 +57,7 @@
     
     <div id="result"></div>
 
+    <input id="user-name" />
     <button onclick="getUsers()">Get Users</button>
     
     <div id="result-user"></div>
@@ -97,8 +98,9 @@
 
     async function getUsers() {
       const resultDiv = document.getElementById('result-user');
+      const fileInput = document.getElementById('user-name');
       try {
-        const response = await fetch('http://localhost:4000/api/users');
+        const response = await fetch(`http://localhost:4000/api/users/${fileInput.value}`);
 
         if (!response.ok) {
           throw new Error('Get users data failed');

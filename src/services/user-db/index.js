@@ -52,10 +52,10 @@ module.exports = (app) => {
     },
 
     // 获取单个用户
-    getUserById: async (req, res) => {
+    getUserByName: async (req, res) => {
       try {
         const user = await db.collection('users').findOne({ 
-          _id: new ObjectId(req.params.id) 
+          username: req.params.username
         });
         
         if (!user) {
@@ -121,7 +121,7 @@ module.exports = (app) => {
       
       // 用户路由
       router.get('/users', userHandlers.getUsers);
-      router.get('/users/:id', userHandlers.getUserById);
+      router.get('/users/:username', userHandlers.getUserByName);
       router.post('/users', userHandlers.createUser);
       
       // 将服务路由挂载到主应用
