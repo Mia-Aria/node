@@ -1,0 +1,95 @@
+<!--
+ * @Author: gaoyang334 gaoyang334@jd.com
+ * @Date: 2025-07-07 11:22:28
+ * @LastEditors: gaoyang334 gaoyang334@jd.com
+ * @LastEditTime: 2025-07-07 15:12:19
+ * @FilePath: /node-be/index.html
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Converter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .container {
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #result {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Excel to JSON Converter</h1>
+  <div class="container">
+    <h2>Upload Excel File</h2>
+    <input type="file" id="fileInput" accept=".xlsx,.xls" />
+    <button onclick="convertToJson()">Convert to JSON</button>
+    
+    <div id="result"></div>
+  </div>
+
+  <script>
+    async function convertToJson() {
+      const fileInput = document.getElementById('fileInput');
+      const resultDiv = document.getElementById('result');
+      
+      if (!fileInput.files.length) {
+        resultDiv.textContent = 'Please select a file first.';
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append('excelFile', file);
+
+      try {
+        resultDiv.textContent = 'Converting...';
+        
+        const response = await fetch('http://localhost:4000/api/excel-to-json', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error('Conversion failed');
+        }
+
+        const data = await response.json();
+        resultDiv.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        resultDiv.textContent = 'Error: ' + error.message;
+      }
+    }
+  </script>
+</body>
+</html>
